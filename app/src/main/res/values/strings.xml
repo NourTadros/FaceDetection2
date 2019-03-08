@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">FaceDetention</string>
+    <string name="explanation_permission_location_request">We are requesting the location permission as it is necessary for the app to perform search functionality properly.\nPlease select \"Grant Permission\" to try again and \"Cancel \" to deny permission.";</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
