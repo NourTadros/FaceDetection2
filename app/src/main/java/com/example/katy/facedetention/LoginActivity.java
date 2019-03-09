@@ -75,6 +75,7 @@ EditText username,password;
            public void onClick(View v) {
                Intent i=new Intent(LoginActivity.this,RegisterationActivity.class);
                startActivity(i);
+               finish();
 
            }
        });
@@ -104,6 +105,7 @@ EditText username,password;
 
                             Intent i = new Intent(LoginActivity.this,MenuActivity.class);
                             startActivity(i);
+                            finish();
 
 
                         } else {
