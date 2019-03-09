@@ -1,18 +1,17 @@
-package com.example.katy.facedetention;
+package com.example.katy.facedetention.Model;
 
 public class UserModel {
-    private String firstName,lastName,emailAddress,mobileNumber, userID; //photoUrl;
+    private String firstName,lastName,emailAddress,mobileNumber, userID;
 
     public UserModel(){
 
     }
 
-    public UserModel(String firstName, String lastName, String emailAddress, String mobileNumber, /*String photoUrl,*/  String userID) {
+    public UserModel(String firstName, String lastName, String emailAddress, String mobileNumber, String userID) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.mobileNumber = mobileNumber;
-       // this.photoUrl = photoUrl;
         this.userID = userID;
     }
 
@@ -55,13 +54,5 @@ public class UserModel {
     public void setUserID(String userID) {
         this.userID = userID;
     }
-
-//    public String getPhotoUrl() {
-//        return photoUrl;
-//    }
-//
-//    public void setPhotoUrl(String photoUrl) {
-//        this.photoUrl = photoUrl;
-//    }
 
 }
