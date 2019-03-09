@@ -60,7 +60,12 @@ EditText username,password;
                     password.setError(("Password must be more than 8 characters"));
                 }
                 else {
-                    login();
+                    if (UtilitiesHelper.isInternetConnected(getBaseContext())){
+                        login();
+                    }else{
+                        UtilitiesHelper.showToast(getBaseContext(), "Please check your internet connection and try again");
+                    }
+
                 }
             }
         });
