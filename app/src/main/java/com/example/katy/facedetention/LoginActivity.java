@@ -1,8 +1,10 @@
 package com.example.katy.facedetention;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,22 +49,19 @@ EditText username,password;
             @Override
             public void onClick(View v) {
                 boolean valid = true;
-                if (username.getText().toString().isEmpty() || username.length() > 30) {
+
+                if (username.getText().toString().isEmpty()) {
                     username.setError("Please Enter Your username");
                     valid = false;
-
-                }
-                if (password.getText().toString().isEmpty() || password.length() < 8) {
+                } else if (password.getText().toString().isEmpty()) {
                     password.setError(("Empty! Please Enter Your Password"));
                     valid = false;
+                }else if ((password.length() < 8)){
+                    password.setError(("Password must be more than 8 characters"));
                 }
-
-                if (valid) {
+                else {
                     login();
                 }
-
-                Intent i = new Intent(LoginActivity.this,MenuActivity.class);
-                startActivity(i);
             }
         });
        signuphere=findViewById(R.id.signupBtn);
@@ -98,6 +97,8 @@ EditText username,password;
 
                             Log.i("userid", mAuth.getCurrentUser().getUid());
 
+                            Intent i = new Intent(LoginActivity.this,MenuActivity.class);
+                            startActivity(i);
 
 
                         } else {
@@ -105,6 +106,21 @@ EditText username,password;
                             Log.w("Login", "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                            builder.setMessage("Authentication failed \n" + task.getException().getMessage().toString())
+                                    .setCancelable(false)
+                                    .setTitle("Oops")
+                                    .setPositiveButton("ok",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) {
+                                                    // finish the current activity
+                                                    // AlertBoxAdvance.this.finish();
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                            AlertDialog alert = builder.create();
+                            alert.show();
                         }
                     }
                 });
