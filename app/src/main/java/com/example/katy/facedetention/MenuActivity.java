@@ -16,6 +16,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.SparseArray;
 import android.view.View;
@@ -41,6 +42,7 @@ public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,FragmentChangeListener {
 
     TextView userDisplayEmail;
+    TextView text1,text2;
 
 
     @Override
@@ -50,6 +52,11 @@ public class MenuActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Button btn = findViewById(R.id.button);
+        text1=findViewById(R.id.text1);
+        text2=findViewById(R.id.text2);
+
+
+
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -66,7 +73,33 @@ public class MenuActivity extends AppCompatActivity
         
         userDisplayEmail.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_share: {
+                ShareData();
+                break;
+            }
+            // case blocks for other MenuItems (if any)
+        }
+        return true;
+    }
+    public void ShareData(){
 
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String shareBody = "Download Selfie Go to detect your friend's faces and have some selfie fun.";
+        //sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+
+    }
 
 
     //hide the navigation drawer menu when the back resetPasswordBtn is pressed
@@ -98,6 +131,8 @@ public class MenuActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
             replaceFragment(new SettingsFragment(),"Settings");
+            text1.setAlpha(0);
+            text2.setAlpha(0);
 
         } else if (id == R.id.nav_logout) {
             getApplicationContext().getSharedPreferences("automaticlogin",0).edit().clear().apply();

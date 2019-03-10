@@ -92,7 +92,7 @@ public class SettingsFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.i("isDriverFromDb", "Failed to read value." + error.toException());
+                Log.i("isUserFromDb", "Failed to read value." + error.toException());
             }
         });
     }
