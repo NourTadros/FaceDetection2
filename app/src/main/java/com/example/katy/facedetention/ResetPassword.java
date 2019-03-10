@@ -20,8 +20,9 @@ public class ResetPassword extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reset_password);
-        emailFld = (EditText) findViewById(R.id.EmailID);
-        resetPasswordBtn = (Button) findViewById(R.id.button3);
+        emailFld =  findViewById(R.id.EmailID);
+        emailFld.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        resetPasswordBtn =  findViewById(R.id.button3);
         resetPasswordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
