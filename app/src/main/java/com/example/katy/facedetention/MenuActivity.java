@@ -120,10 +120,17 @@ public class MenuActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if(id==R.id.nav_home){
+            Intent i=new Intent(MenuActivity.this,MenuActivity.class);
+            startActivity(i);
+            finish();
+        }
+
+        else if (id == R.id.nav_camera) {
             // Handle the camera action
             Intent i=new Intent(MenuActivity.this,CameraActivity.class);
             startActivity(i);
+            
 
         } else if (id == R.id.nav_gallery) {
 
@@ -133,6 +140,7 @@ public class MenuActivity extends AppCompatActivity
             replaceFragment(new SettingsFragment(),"Settings");
             text1.setAlpha(0);
             text2.setAlpha(0);
+
 
         } else if (id == R.id.nav_logout) {
             getApplicationContext().getSharedPreferences("automaticlogin",0).edit().clear().apply();
