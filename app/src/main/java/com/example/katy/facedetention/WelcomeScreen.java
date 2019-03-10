@@ -1,7 +1,9 @@
 package com.example.katy.facedetention;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -43,43 +45,54 @@ public class WelcomeScreen extends AppCompatActivity {
             @Override
             public void run() {
 
-                if (UtilitiesHelper.getUsername(getApplicationContext()).isEmpty()) {
-                    Log.i("user", "no user data");
-                    Intent i = new Intent(WelcomeScreen.this, LoginActivity.class);
-                    startActivity(i);
-                    finish();
-                } else {
-                    mAuth.signInWithEmailAndPassword(UtilitiesHelper.getUsername(getApplicationContext()), UtilitiesHelper.getPassword(getApplicationContext()))
-                            .addOnCompleteListener(WelcomeScreen.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        // Sign in success, update UI with the signed-in user's information
+                if(UtilitiesHelper.isInternetConnected(getBaseContext())) {
 
-                                        dialog = ProgressDialog.show(WelcomeScreen.this, "",
-                                                "Loading. Please wait...", true);
 
-                                        Log.d("Login", "signInWithEmail:success");
+                    if (UtilitiesHelper.getUsername(getApplicationContext()).isEmpty()) {
+                        Log.i("user", "no user data");
+                        Intent i = new Intent(WelcomeScreen.this, LoginActivity.class);
+                        startActivity(i);
+                        finish();
+                    } else {
+                        mAuth.signInWithEmailAndPassword(UtilitiesHelper.getUsername(getApplicationContext()), UtilitiesHelper.getPassword(getApplicationContext()))
+                                .addOnCompleteListener(WelcomeScreen.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            // Sign in success, update UI with the signed-in user's information
 
-                                        FirebaseUser user = mAuth.getCurrentUser();
+                                            dialog = ProgressDialog.show(WelcomeScreen.this, "",
+                                                    "Loading. Please wait...", true);
 
-                                        Intent i = new Intent(WelcomeScreen.this, MenuActivity.class);
-                                        startActivity(i);
-                                        finish();
-                                    } else {
-                                        // If sign in fails, display a message to the user.
-                                        Log.w("Login", "signInWithEmail:failure", task.getException());
-                                        Toast.makeText(WelcomeScreen.this, "Authentication failed.",
-                                                Toast.LENGTH_SHORT).show();
+                                            Log.d("Login", "signInWithEmail:success");
+
+                                            FirebaseUser user = mAuth.getCurrentUser();
+
+                                            Intent i = new Intent(WelcomeScreen.this, MenuActivity.class);
+                                            startActivity(i);
+                                            finish();
+                                        } else {
+                                            // If sign in fails, display a message to the user.
+                                            Log.w("Login", "signInWithEmail:failure", task.getException());
+                                            Toast.makeText(WelcomeScreen.this, "Authentication failed.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
-                            });
+
+
+                                });
+                    }
+                }
+                else{
+
+                    UtilitiesHelper.showToast(getBaseContext(), "Please check your internet connection and try again");
                 }
 
 
             }
         }, SPLASH_DISPLAY_LENGTH);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
