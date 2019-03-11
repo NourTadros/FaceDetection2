@@ -54,46 +54,48 @@ import static com.example.katy.facedetention.MainActivity.REQUEST_IMAGE_CAPTURE;
 public class CameraActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     Button camera;
-ImageButton thumbnail;
-ImageView myImageView;
+    ImageButton thumbnail;
+    ImageView myImageView;
 
 
-
-public StorageReference mStorageRef;
-public Uri filePath;
-StorageReference storageReference;
-private FirebaseAuth mAuth;
+    public StorageReference mStorageRef;
+    public Uri filePath;
+    StorageReference storageReference;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
-        camera=findViewById(R.id.camera);
-        myImageView=findViewById(R.id.imgview);
+        camera = findViewById(R.id.camera);
+        myImageView = findViewById(R.id.imgview);
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dispatchTakePictureIntent();
             }
         });
-        thumbnail=findViewById(R.id.imgthumbnail);
+        thumbnail = findViewById(R.id.imgthumbnail);
 
     }
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
 
         Log.i("data.get data", String.valueOf(data.getData()));
 
         Log.i("data", String.valueOf(data));
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK ) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
 
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -139,21 +141,26 @@ private FirebaseAuth mAuth;
 
 
             Picasso.with(this).load(filePath).into(thumbnail);
+            thumbnail.setImageBitmap(imageBitmap);
 
             thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                   faceDetection(data,v);
+                    faceDetection(data, v);
+                    //showMessage("Oops","Your facial features are unclear\n Please try again");
 
                 }
             });
 
         }
     }
-    public void faceDetection(final Intent data, View v){
+
+    public void faceDetection(final Intent data, View v) {
+
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inMutable=true;
+        options.inMutable = true;
+
         Bundle extras = data.getExtras();
         Bitmap imageBitmap = (Bitmap) extras.get("data");
         thumbnail.setImageBitmap(imageBitmap);
@@ -167,24 +174,38 @@ private FirebaseAuth mAuth;
         FaceDetector faceDetector = new
                 FaceDetector.Builder(getApplicationContext()).setTrackingEnabled(false)
                 .build();
-        if(!faceDetector.isOperational()){
+
+        if (!faceDetector.isOperational()) {
             new AlertDialog.Builder(v.getContext()).setMessage("Could not set up the face detector!").show();
             return;
         }
+
         Frame frame = new Frame.Builder().setBitmap(imageBitmap).build();
         SparseArray<Face> faces = faceDetector.detect(frame);
-        for(int i=0; i<faces.size(); i++) {
+        if(faces.size()==0){
+            showMessage("Oops","Your facial features are unclear\n Please press on the picture to try again");
+
+        }
+
+        for (int i = 0; i < faces.size(); i++) {
+            Log.i("face_size", String.valueOf(faces.size()));
+
             Face thisFace = faces.valueAt(i);
             float x1 = thisFace.getPosition().x;
             float y1 = thisFace.getPosition().y;
             float x2 = x1 + thisFace.getWidth();
             float y2 = y1 + thisFace.getHeight();
             tempCanvas.drawRoundRect(new RectF(x1, y1, x2, y2), 2, 2, myRectPaint);
+            showMessage("Wohoo", "Your facial features are clear\n press ok to check it out");
         }
-        myImageView.setImageDrawable(new BitmapDrawable(getResources(),tempBitmap));
+        myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
         camera.setAlpha(0);
         uploadPhoto();
     }
+
+
+
+
 
 
     public void addDataTodb( String photoURL,String UserID) {
@@ -233,6 +254,18 @@ private FirebaseAuth mAuth;
 
 
 
+    }
+    public void showMessage(String title,String Message){
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setPositiveButton(android.R.string.ok,new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(Message);
+        builder.show();
     }
 
     public void uploadPhoto(){
