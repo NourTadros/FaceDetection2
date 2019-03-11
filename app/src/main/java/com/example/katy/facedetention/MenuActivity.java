@@ -38,6 +38,8 @@ import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.firebase.auth.FirebaseAuth;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,FragmentChangeListener {
 
@@ -144,10 +146,7 @@ public class MenuActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_logout) {
             getApplicationContext().getSharedPreferences("automaticlogin",0).edit().clear().apply();
-
-
             FirebaseAuth.getInstance().signOut();
-            //LoginManager.getInstance().logOut();
 
             Intent i = new Intent(MenuActivity.this, LoginActivity.class);
             startActivity(i);

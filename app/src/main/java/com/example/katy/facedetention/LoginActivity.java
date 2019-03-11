@@ -31,20 +31,33 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
     TextView textstatus;
-
-Button signuphere,login;
+    Button signuphere,login, resetPasswordBtn;
     LoginButton login_button;
     CallbackManager callbackManager;
-private FirebaseAuth mAuth;
-EditText username,password;
+    private FirebaseAuth mAuth;
+    EditText username,password;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        mAuth=FirebaseAuth.getInstance();
-        username=findViewById(R.id.usernameLoginET);
-        password=findViewById(R.id.passwordLoginET);
-        login=findViewById(R.id.LoginUserBtn);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        username = findViewById(R.id.usernameLoginET);
+        password = findViewById(R.id.passwordLoginET);
+
+        resetPasswordBtn = findViewById(R.id.resetPasswordBtn);
+        resetPasswordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(LoginActivity.this,ResetPassword.class);
+                startActivity(i);
+                finish();
+            }
+        });
+
+        login = findViewById(R.id.LoginUserBtn);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

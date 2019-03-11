@@ -23,6 +23,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +37,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class UtilitiesHelper {
 
@@ -70,6 +73,10 @@ public class UtilitiesHelper {
     }
 
 
+    public static void logout(){
+
+        //LoginManager.getInstance().logOut();
+    }
 
 
     public static boolean isInternetConnected(Context mContext) {
