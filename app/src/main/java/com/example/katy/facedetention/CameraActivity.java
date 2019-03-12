@@ -14,10 +14,12 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +30,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.firebase.storage.FirebaseStorage;
 import com.squareup.picasso.Picasso;
 
 import com.example.katy.facedetention.Model.PictureModel;
@@ -46,7 +50,10 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 import static com.example.katy.facedetention.MainActivity.REQUEST_IMAGE_CAPTURE;
@@ -56,105 +63,174 @@ public class CameraActivity extends AppCompatActivity {
     Button camera;
     ImageButton thumbnail;
     ImageView myImageView;
+    String currentPhotoPath;
+
+    private String deviceIdentifier;
+
+    private FirebaseStorage firebaseStorage;
 
 
     public StorageReference mStorageRef;
     public Uri filePath;
     StorageReference storageReference;
-    private FirebaseAuth mAuth;
+    public FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        firebaseStorage = FirebaseStorage.getInstance();
         camera = findViewById(R.id.camera);
         myImageView = findViewById(R.id.imgview);
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+                    dispatchTakePictureIntent();
+                }
             }
         });
         thumbnail = findViewById(R.id.imgthumbnail);
 
     }
+//    private void galleryAddPic() {
+//        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+//        File f = new File(currentPhotoPath);
+//        Uri contentUri = Uri.fromFile(f);
+//        mediaScanIntent.setData(contentUri);
+//        this.sendBroadcast(mediaScanIntent);
+//    }
+
+//
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePictureIntent.putExtra( MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//            File photoFile = null;
+//            try {
+//                photoFile = createImageFile();
+//            } catch (IOException ex) {
+//                // Error occurred while creating the File
+//                Log.i("Error", "Error while creating the file");
+//
+//            }
+//            if (photoFile != null) {
+//                Uri photoURI = FileProvider.getUriForFile(this,
+//                        "com.example.android.fileprovider",
+//                        photoFile);
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+            File pictureFile = null;
+            try {
+                pictureFile = createImageFile();
+            } catch (IOException ex) {
+                Toast.makeText(this,
+                        "Photo file can't be created, please try again",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (pictureFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        pictureFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+            }
         }
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        Log.i("data.get data", String.valueOf(data.getData()));
-
-        Log.i("data", String.valueOf(data));
+//        Log.i("data.get data", String.valueOf(data.getData()));
+//
+//        Log.i("data", String.valueOf(data));
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-
-            // Here, thisActivity is the current activity
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                // Permission is not granted
-                // Should we show an explanation?
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-                    Log.i("permission", "please give permission");
-                } else {
-                    // No explanation needed; request the permission
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
-                }
-            } else {
-                // Permission has already been granted
-                filePath = data.getData();
-                Log.i("uri in zeft", String.valueOf(filePath));
+            File imgFile = new  File(currentPhotoPath);
+            if(imgFile.exists())            {
+                myImageView.setImageURI(Uri.fromFile(imgFile));
             }
+        }
+        camera.setAlpha(0);
 
-
+//            Bundle extras = data.getExtras();
+//            Bitmap imageBitmap = (Bitmap) extras.get("data");
 //
-//            Uri imageUri = data.getData();
+//            // Here, thisActivity is the current activity
+//            if (ContextCompat.checkSelfPermission(this,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    != PackageManager.PERMISSION_GRANTED) {
 //
-//            Log.i("file path in acresult:", String.valueOf(imageUri));
+//                // Permission is not granted
+//                // Should we show an explanation?
+//                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+//                    // Show an explanation to the user *asynchronously* -- don't block
+//                    // this thread waiting for the user's response! After the user
+//                    // sees the explanation, try again to request the permission.
+//                    Log.i("permission", "please give permission");
+//                } else {
+//                    // No explanation needed; request the permission
+//                    ActivityCompat.requestPermissions(this,
+//                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 //
-//            Log.i("file path from func:", String.valueOf(filePath));
+//                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+//                    // app-defined int constant. The callback method gets the
+//                    // result of the request.
+//                }
+//            } else {
+//                // Permission has already been granted
+//                filePath = data.getData();
+//                Log.i("uri in zeft", String.valueOf(filePath));
+//            }
 //
-//            Log.i("file path from get:", String.valueOf(getImageUri(getBaseContext(), imageBitmap)));
-
-
-            Picasso.with(this).load(filePath).into(thumbnail);
-            thumbnail.setImageBitmap(imageBitmap);
+//
+////
+////            Uri imageUri = data.getData();
+////
+////            Log.i("file path in acresult:", String.valueOf(imageUri));
+////
+////            Log.i("file path from func:", String.valueOf(filePath));
+////
+////            Log.i("file path from get:", String.valueOf(getImageUri(getBaseContext(), imageBitmap)));
+//
+//
+//            Picasso.with(this).load(filePath).into(thumbnail);
+//            thumbnail.setImageBitmap(imageBitmap);
 
             thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
                     faceDetection(data, v);
+
                     //showMessage("Oops","Your facial features are unclear\n Please try again");
 
                 }
             });
 
         }
-    }
+
 
     public void faceDetection(final Intent data, View v) {
 
@@ -197,10 +273,11 @@ public class CameraActivity extends AppCompatActivity {
             float y2 = y1 + thisFace.getHeight();
             tempCanvas.drawRoundRect(new RectF(x1, y1, x2, y2), 2, 2, myRectPaint);
             showMessage("Wohoo", "Your facial features are clear\n press ok to check it out");
+            addToCloudStorage();
         }
         myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
         camera.setAlpha(0);
-        uploadPhoto();
+        //uploadPhoto();
     }
 
 
@@ -266,6 +343,37 @@ public class CameraActivity extends AppCompatActivity {
         builder.setTitle(title);
         builder.setMessage(Message);
         builder.show();
+    }
+
+    private void addToCloudStorage() {
+        File f = new File(currentPhotoPath);
+        Uri picUri = Uri.fromFile(f);
+        final String cloudFilePath = deviceIdentifier + picUri.getLastPathSegment();
+
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageRef = firebaseStorage.getReference();
+        StorageReference uploadeRef = storageRef.child(cloudFilePath);
+
+        final ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Uploading...");
+        progressDialog.show();
+
+        uploadeRef.putFile(picUri).addOnFailureListener(new OnFailureListener(){
+            public void onFailure(@NonNull Exception exception){
+                Log.e("CaptureImage","Failed to upload picture to cloud storage");
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>(){
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot){
+                Toast.makeText(CameraActivity.this,
+                        "Image has been uploaded to cloud storage",
+                        Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+                String UserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                addDataTodb(currentPhotoPath,UserID);
+            }
+
+        });
     }
 
     public void uploadPhoto(){
