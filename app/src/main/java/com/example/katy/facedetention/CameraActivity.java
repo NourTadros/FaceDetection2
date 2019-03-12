@@ -160,7 +160,7 @@ public class CameraActivity extends AppCompatActivity {
                         "com.example.android.fileprovider",
                         pictureFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                //startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
             }
         }
@@ -364,7 +364,7 @@ public class CameraActivity extends AppCompatActivity {
     private void addToCloudStorage() {
         File f = new File(currentPhotoPath);
         Uri picUri = Uri.fromFile(f);
-        final String cloudFilePath = /*deviceIdentifier +*/ picUri.getLastPathSegment();
+        final String cloudFilePath = picUri.getLastPathSegment();
 
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference storageRef = firebaseStorage.getReference();
