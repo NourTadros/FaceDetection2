@@ -169,6 +169,7 @@ public class CameraActivity extends AppCompatActivity {
         camera.setAlpha(0);
         arrow.setVisibility(View.VISIBLE);
         checkSelfie.setVisibility(View.VISIBLE);
+        myImageView.setVisibility(View.GONE);
 
 
 
@@ -226,7 +227,7 @@ public class CameraActivity extends AppCompatActivity {
             float x2 = x1 + thisFace.getWidth();
             float y2 = y1 + thisFace.getHeight();
             tempCanvas.drawRoundRect(new RectF(x1, y1, x2, y2), 2, 2, myRectPaint);
-            showMessage("Wohoo", "Your facial features are clear\n press ok to check it out");
+            //showMessage("Wohoo", "Your facial features are clear\n press ok to check it out");
             addToCloudStorage();
         }
         myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
@@ -261,7 +262,7 @@ public class CameraActivity extends AppCompatActivity {
                     if (task.isSuccessful()){
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
-                        builder.setMessage("Picture Added Successfully, you will be returned to the Main activity")
+                        builder.setMessage("Your facial features are clear.\nPicture Added Successfully, you will be returned to the Main activity")
                                 .setCancelable(false)
                                 .setTitle("Congratulations")
                                 .setPositiveButton("ok",
