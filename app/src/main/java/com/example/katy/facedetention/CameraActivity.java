@@ -121,7 +121,7 @@ public class CameraActivity extends AppCompatActivity {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", storageDir);
 
-        // Save a file: path for use with ACTION_VIEW intents
+
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -131,19 +131,7 @@ public class CameraActivity extends AppCompatActivity {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         takePictureIntent.putExtra( MediaStore.EXTRA_FINISH_ON_COMPLETION, true);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-//            File photoFile = null;
-//            try {
-//                photoFile = createImageFile();
-//            } catch (IOException ex) {
-//                // Error occurred while creating the File
-//                Log.i("Error", "Error while creating the file");
-//
-//            }
-//            if (photoFile != null) {
-//                Uri photoURI = FileProvider.getUriForFile(this,
-//                        "com.example.android.fileprovider",
-//                        photoFile);
-//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 
             File pictureFile = null;
@@ -171,9 +159,6 @@ public class CameraActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-//        Log.i("data.get data", String.valueOf(data.getData()));
-//
-//        Log.i("data", String.valueOf(data));
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             File imgFile = new  File(currentPhotoPath);
@@ -185,51 +170,7 @@ public class CameraActivity extends AppCompatActivity {
         arrow.setVisibility(View.VISIBLE);
         checkSelfie.setVisibility(View.VISIBLE);
 
-//            Bundle extras = data.getExtras();
-//            Bitmap imageBitmap = (Bitmap) extras.get("data");
-//
-//            // Here, thisActivity is the current activity
-//            if (ContextCompat.checkSelfPermission(this,
-//                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//
-//                // Permission is not granted
-//                // Should we show an explanation?
-//                if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-//                    // Show an explanation to the user *asynchronously* -- don't block
-//                    // this thread waiting for the user's response! After the user
-//                    // sees the explanation, try again to request the permission.
-//                    Log.i("permission", "please give permission");
-//                } else {
-//                    // No explanation needed; request the permission
-//                    ActivityCompat.requestPermissions(this,
-//                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-//
-//                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-//                    // app-defined int constant. The callback method gets the
-//                    // result of the request.
-//                }
-//            } else {
-//                // Permission has already been granted
-//                filePath = data.getData();
-//                Log.i("uri in zeft", String.valueOf(filePath));
-//            }
-//
-//
-////
-////            Uri imageUri = data.getData();
-////
-////            Log.i("file path in acresult:", String.valueOf(imageUri));
-////
-////            Log.i("file path from func:", String.valueOf(filePath));
-////
-////            Log.i("file path from get:", String.valueOf(getImageUri(getBaseContext(), imageBitmap)));
-//
-//
-//            Picasso.with(this).load(filePath).into(thumbnail);
-//            thumbnail.setImageBitmap(imageBitmap);
+
 
             thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -238,7 +179,6 @@ public class CameraActivity extends AppCompatActivity {
                     faceDetection(data, v);
 
 
-                    //showMessage("Oops","Your facial features are unclear\n Please try again");
 
                 }
             });
@@ -293,7 +233,6 @@ public class CameraActivity extends AppCompatActivity {
         camera.setAlpha(0);
         arrow.setVisibility(View.GONE);
         checkSelfie.setVisibility(View.GONE);
-        //uploadPhoto();
     }
 
 
@@ -392,67 +331,7 @@ public class CameraActivity extends AppCompatActivity {
         });
     }
 
-    public void uploadPhoto(){
 
-        Log.i("file path:", String.valueOf(filePath));
-        if (filePath!=null) {
-            UploadTask uploadTask = mStorageRef.putFile(filePath);
-
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
-
-            final StorageReference ref = storageReference.child(new StringBuilder("users/").append(UUID.randomUUID().toString()).toString());
-            uploadTask = ref.putFile(filePath);
-
-            Task<Uri> urlTask = uploadTask.continueWithTask(
-                    new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
-                            }
-                            return ref.getDownloadUrl();
-                        }
-                    })
-                    .addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                Uri downloadUri = task.getResult();
-                                progressDialog.dismiss();
-
-                                Log.i("URL", downloadUri.toString());
-                               String UserID= mAuth.getCurrentUser().getUid();
-                                addDataTodb( downloadUri.toString(),UserID);
-                            } else {
-                                Toast.makeText(CameraActivity.this, "Fail UPLOAD", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    })
-                    .addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            progressDialog.setMessage("Uploaded: ");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            progressDialog.dismiss();
-                            Toast.makeText(CameraActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
-    }
-
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-        Log.i("path in funct", path);
-        return Uri.parse(path);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
