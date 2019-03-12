@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.storage.FirebaseStorage;
@@ -49,6 +50,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +65,8 @@ public class CameraActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     Button camera;
     ImageButton thumbnail;
-    ImageView myImageView;
+    ImageView myImageView,arrow;
+    TextView checkSelfie;
     String currentPhotoPath;
 
     private String deviceIdentifier;
@@ -80,6 +84,13 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+        arrow=findViewById(R.id.arrow);
+        checkSelfie=findViewById(R.id.presshereselfie);
+        arrow.setVisibility(View.GONE);
+        checkSelfie.setVisibility(View.GONE);
+
+
         firebaseStorage = FirebaseStorage.getInstance();
         camera = findViewById(R.id.camera);
         myImageView = findViewById(R.id.imgview);
@@ -149,7 +160,7 @@ public class CameraActivity extends AppCompatActivity {
                         "com.example.android.fileprovider",
                         pictureFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                //startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
             }
         }
@@ -171,6 +182,8 @@ public class CameraActivity extends AppCompatActivity {
             }
         }
         camera.setAlpha(0);
+        arrow.setVisibility(View.VISIBLE);
+        checkSelfie.setVisibility(View.VISIBLE);
 
 //            Bundle extras = data.getExtras();
 //            Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -223,6 +236,7 @@ public class CameraActivity extends AppCompatActivity {
                 public void onClick(View v) {
 
                     faceDetection(data, v);
+
 
                     //showMessage("Oops","Your facial features are unclear\n Please try again");
 
@@ -277,6 +291,8 @@ public class CameraActivity extends AppCompatActivity {
         }
         myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
         camera.setAlpha(0);
+        arrow.setVisibility(View.GONE);
+        checkSelfie.setVisibility(View.GONE);
         //uploadPhoto();
     }
 
@@ -348,7 +364,7 @@ public class CameraActivity extends AppCompatActivity {
     private void addToCloudStorage() {
         File f = new File(currentPhotoPath);
         Uri picUri = Uri.fromFile(f);
-        final String cloudFilePath = deviceIdentifier + picUri.getLastPathSegment();
+        final String cloudFilePath = /*deviceIdentifier +*/ picUri.getLastPathSegment();
 
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference storageRef = firebaseStorage.getReference();
