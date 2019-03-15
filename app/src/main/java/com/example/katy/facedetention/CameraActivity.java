@@ -178,6 +178,7 @@ public class CameraActivity extends AppCompatActivity {
                 public void onClick(View v) {
 
                     faceDetection(data, v);
+                    myImageView.setVisibility(View.VISIBLE);
 
 
 
