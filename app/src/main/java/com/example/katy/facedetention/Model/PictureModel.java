@@ -1,7 +1,7 @@
 package com.example.katy.facedetention.Model;
 
 public class PictureModel {
-    private String photoURL, userID,PictureID;
+    private String photoURL, userID, pictureID;
 
     public PictureModel(){
 
@@ -10,7 +10,7 @@ public class PictureModel {
     public PictureModel(String PhotoURL, String userID,String PictureID) {
         this.photoURL = PhotoURL;
         this.userID = userID;
-        this.PictureID=PictureID;
+        this.pictureID =PictureID;
     }
 
     public String getPhotoURL() {
@@ -30,11 +30,11 @@ public class PictureModel {
     }
 
     public String getPictureID() {
-        return PictureID;
+        return pictureID;
     }
 
     public void setPictureID(String PictureID) {
-        this.PictureID = PictureID;
+        this.pictureID = PictureID;
     }
 
 

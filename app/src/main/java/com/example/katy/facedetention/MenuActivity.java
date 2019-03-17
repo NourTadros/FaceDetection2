@@ -136,6 +136,8 @@ public class MenuActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_gallery) {
 
+            Intent i=new Intent(MenuActivity.this,GalleryActivity.class);
+            startActivity(i);
 
         } else if (id == R.id.nav_manage) {
 

@@ -91,6 +91,7 @@ public class CameraActivity extends AppCompatActivity {
         checkSelfie.setVisibility(View.GONE);
 
 
+
         firebaseStorage = FirebaseStorage.getInstance();
         camera = findViewById(R.id.camera);
         myImageView = findViewById(R.id.imgview);
