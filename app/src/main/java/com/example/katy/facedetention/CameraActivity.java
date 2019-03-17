@@ -49,6 +49,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.firebase.storage.FirebaseStorage;
+
 
 import org.w3c.dom.Text;
 
@@ -71,9 +73,6 @@ public class CameraActivity extends AppCompatActivity {
 
     private String deviceIdentifier;
 
-    private FirebaseStorage firebaseStorage;
-
-
     public StorageReference mStorageRef;
     public Uri filePath;
     StorageReference storageReference;
@@ -91,8 +90,6 @@ public class CameraActivity extends AppCompatActivity {
         checkSelfie.setVisibility(View.GONE);
 
 
-
-        firebaseStorage = FirebaseStorage.getInstance();
         camera = findViewById(R.id.camera);
         myImageView = findViewById(R.id.imgview);
         camera.setOnClickListener(new View.OnClickListener() {
@@ -308,15 +305,15 @@ public class CameraActivity extends AppCompatActivity {
         Uri picUri = Uri.fromFile(f);
         final String cloudFilePath = picUri.getLastPathSegment();
 
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        StorageReference storageRef = firebaseStorage.getReference();
-        StorageReference uploadeRef = storageRef.child(cloudFilePath);
+
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference uploadRef = storageRef.child(cloudFilePath);
 
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Uploading...");
         progressDialog.show();
 
-        uploadeRef.putFile(picUri).addOnFailureListener(new OnFailureListener(){
+        uploadRef.putFile(picUri).addOnFailureListener(new OnFailureListener(){
             public void onFailure(@NonNull Exception exception){
                 Log.e("CaptureImage","Failed to upload picture to cloud storage");
             }
@@ -327,8 +324,10 @@ public class CameraActivity extends AppCompatActivity {
                         "Image has been uploaded to cloud storage",
                         Toast.LENGTH_SHORT).show();
                 progressDialog.dismiss();
+                Uri downloadUri = taskSnapshot.getDownloadUrl();
+
                 String UserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                addDataTodb(currentPhotoPath,UserID);
+                addDataTodb(downloadUri.toString(),UserID);
             }
 
         });
