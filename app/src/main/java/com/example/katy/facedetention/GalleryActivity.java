@@ -32,19 +32,6 @@ public class GalleryActivity extends AppCompatActivity {
     AlertDialog alert;
 
 
-
-    private final String image_titles[] = {
-            "Img1",
-            "Img2",
-            "Img3",
-    };
-    private final Integer image_ids[] = {
-            R.mipmap.img1,
-            R.mipmap.img2,
-            R.mipmap.img3,
-
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,14 +40,13 @@ public class GalleryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.imageGallery);
         recyclerView.setHasFixedSize(true);
 
-
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(),2);
         recyclerView.setLayoutManager(layoutManager);
 
         firebaseDb = FirebaseDatabase.getInstance();
 
         //fetchPictures();
-        fetchUser();
+        fetchPictureCorrespondingToUser();
     }
     private ArrayList<PictureModel> prepareData(){
 
@@ -74,20 +60,12 @@ public class GalleryActivity extends AppCompatActivity {
         return theimage;
     }
 
-    public void initializePictures(){
-        ArrayList<String> UserID = new ArrayList<>();
-
-        for (int i = 0; i< picturesModelArrayList.size(); i++){
-            fetchUser();
-        }
-    }
-
-    private void fetchUser(){
+    private void fetchPictureCorrespondingToUser(){
         dbRef = firebaseDb.getReference().child(UtilitiesHelper.Picture_TABLE_NAME);
         Query userQuery = dbRef.orderByChild("userID").equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         picturesModelArrayList = new ArrayList<>();
-        
+
         userQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -112,7 +90,7 @@ public class GalleryActivity extends AppCompatActivity {
                 } else {
                     if (dataSnapshot.exists()) {
 
-                        Log.i("reserved rides count", String.valueOf(dataSnapshot.getChildrenCount()));
+                        Log.i("picture count", String.valueOf(dataSnapshot.getChildrenCount()));
 
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             PictureModel pictureModel = snapshot.getValue(PictureModel.class);
@@ -137,7 +115,7 @@ public class GalleryActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchPictures(){
+    /*private void fetchPictures(){
         dbRef = firebaseDb.getReference().child(UtilitiesHelper.Picture_TABLE_NAME);
 
         picturesModelArrayList = new ArrayList<>();
@@ -174,5 +152,5 @@ public class GalleryActivity extends AppCompatActivity {
                     Log.i("isPicFromDb", "Failed to read value." + error.toException());
                 }
             });
-    }
+    }*/
 }
